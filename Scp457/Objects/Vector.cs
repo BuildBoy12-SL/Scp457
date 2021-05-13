@@ -15,17 +15,17 @@ namespace Scp457.Objects
     public class Vector
     {
         /// <summary>
-        /// Gets the abscissa axis value.
+        /// Gets or sets the abscissa axis value.
         /// </summary>
         public float X { get; set; }
 
         /// <summary>
-        /// Gets the ordinate axis value.
+        /// Gets or sets the ordinate axis value.
         /// </summary>
         public float Y { get; set; }
 
         /// <summary>
-        /// Gets the applicate axis value.
+        /// Gets or sets the applicate axis value.
         /// </summary>
         public float Z { get; set; }
 
