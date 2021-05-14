@@ -7,6 +7,11 @@
 
 namespace Scp457.EventHandlers
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Exiled.API.Features;
+    using Scp457.API;
+    using UnityEngine;
     using ServerHandlers = Exiled.Events.Handlers.Server;
 
     /// <summary>
@@ -32,6 +37,15 @@ namespace Scp457.EventHandlers
 
         private void OnRoundStarted()
         {
+            if (Random.Range(0, 100) >= Plugin.Instance.Config.Scp457Settings.SpawnChance)
+                return;
+
+            List<Player> players = Player.List.Where(x => x.Team == Team.SCP).ToList();
+            if (players.Count == 0)
+                return;
+
+            Player player = players[Random.Range(0, players.Count)];
+            Scp457.Spawn(player);
         }
     }
 }
