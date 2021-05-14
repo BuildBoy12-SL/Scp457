@@ -7,7 +7,9 @@
 
 namespace Scp457.EventHandlers
 {
+    using Exiled.API.Features;
     using Exiled.Events.EventArgs;
+    using Scp457.API;
     using PlayerHandlers = Exiled.Events.Handlers.Player;
 
     /// <summary>
@@ -21,6 +23,7 @@ namespace Scp457.EventHandlers
         public void SubscribeEvents()
         {
             PlayerHandlers.Shot += OnShot;
+            PlayerHandlers.Verified += OnVerified;
         }
 
         /// <summary>
@@ -29,10 +32,19 @@ namespace Scp457.EventHandlers
         public void UnsubscribeEvents()
         {
             PlayerHandlers.Shot -= OnShot;
+            PlayerHandlers.Verified -= OnVerified;
         }
 
         private void OnShot(ShotEventArgs ev)
         {
+            if (Player.Get(ev.Target) is Player player && Scp457.Get(player) != null &&
+                ev.HitboxTypeEnum == HitBoxType.HEAD)
+                ev.Damage /= 4;
+        }
+
+        private void OnVerified(VerifiedEventArgs ev)
+        {
+            BurningHandler.Dictionary.Add(ev.Player, new BurningHandler(ev.Player));
         }
     }
 }

@@ -39,6 +39,11 @@ namespace Scp457.API
         /// </summary>
         public Player Player { get; }
 
+        /// <summary>
+        /// Gets a <see cref="BurningHandler"/> instance from a <see cref="Player"/>.
+        /// </summary>
+        /// <param name="player">The player to search.</param>
+        /// <returns>The <see cref="BurningHandler"/> instance or null.</returns>
         public static BurningHandler Get(Player player)
         {
             if (player == null)
