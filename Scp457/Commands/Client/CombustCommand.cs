@@ -62,8 +62,8 @@ namespace Scp457.Commands.Client
                     continue;
 
                 float burnTime = burningHandler.BurnTime + config.CombustSettings.BurnDuration;
-                if (burnTime < config.BurnSettings.MaximumDuration)
-                    burningHandler.BurnTime = burnTime;
+                if (burnTime > config.BurnSettings.MaximumDuration)
+                    burnTime = config.BurnSettings.MaximumDuration;
 
                 ply.Hurt(config.CombustSettings.Damage, DamageTypes.Asphyxiation, player.Nickname, player.Id);
                 ply.EnableEffect<Flashed>(config.CombustSettings.FlashDuration);

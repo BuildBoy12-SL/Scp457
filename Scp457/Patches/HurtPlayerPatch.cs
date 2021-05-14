@@ -22,7 +22,7 @@ namespace Scp457.Patches
             if (!(Scp457.Get(__instance.gameObject) is Scp457 scp457))
                 return true;
 
-            scp457.Attack();
+            scp457.TryAttack();
             return false;
         }
     }

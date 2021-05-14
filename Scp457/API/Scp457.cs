@@ -136,7 +136,7 @@ namespace Scp457.API
         /// <summary>
         /// Handles the attack logic for the <see cref="Scp457"/>.
         /// </summary>
-        public void Attack()
+        public void TryAttack()
         {
             Vector3 forward = Player.CameraTransform.forward;
             Ray ray = new Ray(Player.CameraTransform.position + forward, forward);
@@ -148,19 +148,14 @@ namespace Scp457.API
             if (!hit)
                 return;
 
-            HitboxIdentity hitbox = raycastHit.collider.GetComponent<HitboxIdentity>();
-            if (hitbox != null)
+            Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
+            if (target == null || target.IsScp || target.SessionVariables.ContainsKey("IsScp035"))
+                return;
+
+            if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
             {
-                Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
-                if (target == null || target.IsScp || target.SessionVariables.ContainsKey("IsScp035"))
-                    return;
-
-                if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
-                {
-                    // RunAttack(Player, target);
-                    PlaceBlood(Player, target.Position);
-                }
-
+                RunAttack(target);
+                PlaceBlood(Player, target.Position);
                 return;
             }
 
@@ -169,5 +164,19 @@ namespace Scp457.API
 
         private static void PlaceBlood(Player attacker, Vector3 position) =>
             attacker.ReferenceHub.characterClassManager.RpcPlaceBlood(position, 1, 2);
+
+        private void RunAttack(Player target)
+        {
+            if (!(BurningHandler.Get(target) is BurningHandler burningHandler))
+                return;
+
+            Config config = Plugin.Instance.Config;
+            float burnTime = burningHandler.BurnTime + config.AttackSettings.BurnDuration;
+            if (burnTime > Plugin.Instance.Config.BurnSettings.MaximumDuration)
+                burnTime = Plugin.Instance.Config.BurnSettings.MaximumDuration;
+
+            burningHandler.BurnTime = burnTime;
+            target.Hurt(config.AttackSettings.Damage, DamageTypes.Asphyxiation, Player.Nickname, Player.Id);
+        }
     }
 }
