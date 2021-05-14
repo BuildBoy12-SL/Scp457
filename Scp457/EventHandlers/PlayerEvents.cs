@@ -7,7 +7,6 @@
 
 namespace Scp457.EventHandlers
 {
-    using Exiled.API.Features;
     using Exiled.Events.EventArgs;
     using Scp457.API;
     using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -25,6 +24,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.ChangingRole += OnChangingRole;
             PlayerHandlers.Died += OnDied;
             PlayerHandlers.Destroying += OnDestroying;
+            PlayerHandlers.MedicalItemUsed += OnMedicalItemUsed;
             PlayerHandlers.Shot += OnShot;
             PlayerHandlers.Verified += OnVerified;
         }
@@ -37,6 +37,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.ChangingRole -= OnChangingRole;
             PlayerHandlers.Died -= OnDied;
             PlayerHandlers.Destroying -= OnDestroying;
+            PlayerHandlers.MedicalItemUsed -= OnMedicalItemUsed;
             PlayerHandlers.Shot -= OnShot;
             PlayerHandlers.Verified -= OnVerified;
         }
@@ -66,6 +67,13 @@ namespace Scp457.EventHandlers
 
             if (Scp457.Get(ev.Target) is Scp457 scp457)
                 scp457.Destroy();
+        }
+
+        private void OnMedicalItemUsed(UsedMedicalItemEventArgs ev)
+        {
+            if (Plugin.Instance.Config.BurnSettings.HealedBy.Contains(ev.Item) &&
+                BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
+                burningHandler.BurnTime = 0f;
         }
 
         private void OnShot(ShotEventArgs ev)

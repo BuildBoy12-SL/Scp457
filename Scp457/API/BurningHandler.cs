@@ -9,12 +9,16 @@ namespace Scp457.API
 {
     using System.Collections.Generic;
     using Exiled.API.Features;
+    using MEC;
 
     /// <summary>
     /// Gets and manipulates data relating to the applied burning effect.
     /// </summary>
     public class BurningHandler
     {
+        private CoroutineHandle coroutine;
+        private float burnTime;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BurningHandler"/> class.
         /// </summary>
@@ -42,7 +46,17 @@ namespace Scp457.API
         /// <summary>
         /// Gets or sets the remaining time for the player to burn.
         /// </summary>
-        public float BurnTime { get; set; }
+        public float BurnTime
+        {
+            get => burnTime;
+            set
+            {
+                if (burnTime == 0f && value > 0f)
+                    coroutine = Timing.RunCoroutine(Burn());
+
+                burnTime = value;
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="BurningHandler"/> instance from a <see cref="Player"/>.
@@ -63,7 +77,30 @@ namespace Scp457.API
         /// </summary>
         public void Destroy()
         {
+            Timing.KillCoroutines(coroutine);
             Dictionary.Remove(Player);
+        }
+
+        /// <summary>
+        /// Deals burn damage to the <see cref="Player"/> while their <see cref="BurnTime"/> is greater than 0.
+        /// </summary>
+        /// <returns>An internal delay.</returns>
+        private IEnumerator<float> Burn()
+        {
+            while (BurnTime > 0f)
+            {
+                if (Player.IsGodModeEnabled)
+                {
+                    BurnTime = 0f;
+                    yield break;
+                }
+
+                Player.Hurt(Plugin.Instance.Config.BurnSettings.Damage, DamageTypes.Asphyxiation, "SCP457");
+                BurnTime -= Plugin.Instance.Config.BurnSettings.TickDuration;
+                yield return Timing.WaitForSeconds(Plugin.Instance.Config.BurnSettings.TickDuration);
+            }
+
+            BurnTime = 0f;
         }
     }
 }

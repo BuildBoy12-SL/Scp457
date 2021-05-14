@@ -23,7 +23,7 @@ namespace Scp457.Configs
         public float Distance { get; set; } = 150f;
 
         /// <summary>
-        /// Gets or sets the duration of the applied burning effect.
+        /// Gets or sets the duration, in seconds, of the applied burning effect.
         /// </summary>
         public float BurnDuration { get; set; } = 10f;
     }
