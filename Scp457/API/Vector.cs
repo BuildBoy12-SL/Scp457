@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Scp457.Objects
+namespace Scp457.API.Features
 {
     using UnityEngine;
 
