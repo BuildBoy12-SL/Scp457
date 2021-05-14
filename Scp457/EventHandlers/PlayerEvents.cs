@@ -37,8 +37,7 @@ namespace Scp457.EventHandlers
 
         private void OnShot(ShotEventArgs ev)
         {
-            if (Player.Get(ev.Target) is Player player && Scp457.Get(player) != null &&
-                ev.HitboxTypeEnum == HitBoxType.HEAD)
+            if (Scp457.Get(ev.Target) != null && ev.HitboxTypeEnum == HitBoxType.HEAD)
                 ev.Damage /= 4;
         }
 

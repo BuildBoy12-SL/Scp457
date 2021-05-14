@@ -9,6 +9,7 @@ namespace Scp457.API
 {
     using System.Collections.Generic;
     using Exiled.API.Features;
+    using Mirror;
     using UnityEngine;
 
     /// <summary>
@@ -22,7 +23,7 @@ namespace Scp457.API
         /// Initializes a new instance of the <see cref="Scp457"/> class.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> that this is to be attached to.</param>
-        public Scp457(Player player)
+        private Scp457(Player player)
         {
             Player = player;
         }
@@ -33,9 +34,14 @@ namespace Scp457.API
         public static Dictionary<Player, Scp457> Dictionary { get; } = new Dictionary<Player, Scp457>();
 
         /// <summary>
-        /// Gets a list of all <see cref="Scp457"/>s.
+        /// Gets a <see cref="IEnumerable{T}"/> of all <see cref="Scp457"/>s.
         /// </summary>
         public static IEnumerable<Scp457> List => Dictionary.Values;
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey,TValue}"/> containing cached <see cref="Scp457"/>s and their <see cref="GameObject"/>s.
+        /// </summary>
+        public static Dictionary<GameObject, Scp457> GameObjectCache { get; } = new Dictionary<GameObject, Scp457>();
 
         /// <summary>
         /// Gets the attached <see cref="Player"/>.
@@ -53,6 +59,32 @@ namespace Scp457.API
 
             player.SessionVariables.Remove(SessionVariable);
             Dictionary.Remove(player);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Scp457"/> instance from a <see cref="Player"/>.
+        /// </summary>
+        /// <param name="gameObject">The player to search.</param>
+        /// <returns>The <see cref="Scp457"/> instance or null.</returns>
+        public static Scp457 Get(GameObject gameObject)
+        {
+            if (gameObject == null)
+                return null;
+
+            if (GameObjectCache.TryGetValue(gameObject, out Scp457 scp457))
+                return scp457;
+
+            foreach (Player player in Dictionary.Keys)
+            {
+                if (player.GameObject != gameObject)
+                    continue;
+
+                Scp457 found = Dictionary[player];
+                GameObjectCache[gameObject] = found;
+                return found;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -95,5 +127,42 @@ namespace Scp457.API
             player.SessionVariables.Add(SessionVariable, true);
             Dictionary.Add(player, new Scp457(player));
         }
+
+        /// <summary>
+        /// Handles the attack logic for the <see cref="Scp457"/>.
+        /// </summary>
+        public void Attack()
+        {
+            Vector3 forward = Player.CameraTransform.forward;
+            Ray ray = new Ray(Player.CameraTransform.position + forward, forward);
+
+            WeaponManager weaponManager = Player.ReferenceHub.weaponManager;
+
+            bool hit = Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, weaponManager.raycastMask);
+
+            if (!hit)
+                return;
+
+            HitboxIdentity hitbox = raycastHit.collider.GetComponent<HitboxIdentity>();
+            if (hitbox != null)
+            {
+                Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
+                if (target == null || target.IsScp || target.SessionVariables.ContainsKey("IsScp035"))
+                    return;
+
+                if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
+                {
+                    // RunAttack(Player, target);
+                    PlaceBlood(Player, target.Position);
+                }
+
+                return;
+            }
+
+            PlaceBlood(Player, raycastHit.point);
+        }
+
+        private static void PlaceBlood(Player attacker, Vector3 position) =>
+            attacker.ReferenceHub.characterClassManager.RpcPlaceBlood(position, 1, 2);
     }
 }

@@ -9,6 +9,7 @@ namespace Scp457
 {
     using System;
     using Exiled.API.Features;
+    using HarmonyLib;
     using Scp457.EventHandlers;
 
     /// <summary>
@@ -17,6 +18,7 @@ namespace Scp457
     public class Plugin : Plugin<Config>
     {
         private static readonly Plugin InstanceValue = new Plugin();
+        private Harmony harmony;
 
         private Plugin()
         {
@@ -56,6 +58,9 @@ namespace Scp457
             PlayerEvents.SubscribeEvents();
             ServerEvents.SubscribeEvents();
 
+            harmony = new Harmony($"build.scp457.{DateTime.UtcNow.Ticks}");
+            harmony.PatchAll();
+
             base.OnEnabled();
         }
 
@@ -69,6 +74,8 @@ namespace Scp457
             MapEvents = null;
             PlayerEvents = null;
             ServerEvents = null;
+
+            harmony.UnpatchAll();
 
             base.OnDisabled();
         }
