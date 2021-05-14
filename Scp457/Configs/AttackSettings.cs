@@ -15,7 +15,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the amount of inflicted damage.
         /// </summary>
-        public float Damage { get; set; }
+        public float Damage { get; set; } = 40f;
 
         /// <summary>
         /// Gets or sets the maximum attack range.

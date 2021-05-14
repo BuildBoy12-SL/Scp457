@@ -54,19 +54,6 @@ namespace Scp457.API
         public float CombustCooldown { get; set; }
 
         /// <summary>
-        /// Removes a player from being considered as Scp457.
-        /// </summary>
-        /// <param name="player">The <see cref="Player"/> to be removed from being Scp457.</param>
-        public static void Destroy(Player player)
-        {
-            if (Get(player) == null)
-                return;
-
-            player.SessionVariables.Remove(SessionVariable);
-            Dictionary.Remove(player);
-        }
-
-        /// <summary>
         /// Gets a <see cref="Scp457"/> instance from a <see cref="Player"/>.
         /// </summary>
         /// <param name="gameObject">The player to search.</param>
@@ -131,6 +118,18 @@ namespace Scp457.API
             player.ShowHint(config.Scp457Settings.SpawnMessage, config.Scp457Settings.SpawnMessageDuration);
             player.SessionVariables.Add(SessionVariable, true);
             Dictionary.Add(player, new Scp457(player));
+        }
+
+        /// <summary>
+        /// Removes the <see cref="Player"/> from being considered as Scp457.
+        /// </summary>
+        public void Destroy()
+        {
+            Player.SessionVariables.Remove(SessionVariable);
+            Dictionary.Remove(Player);
+            Player.Scale = Vector3.one;
+            Player.CustomInfo = string.Empty;
+            Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
         }
 
         /// <summary>

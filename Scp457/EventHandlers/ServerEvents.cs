@@ -25,6 +25,7 @@ namespace Scp457.EventHandlers
         public void SubscribeEvents()
         {
             ServerHandlers.RoundStarted += OnRoundStarted;
+            ServerHandlers.WaitingForPlayers += OnWaitingForPlayers;
         }
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace Scp457.EventHandlers
         public void UnsubscribeEvents()
         {
             ServerHandlers.RoundStarted -= OnRoundStarted;
+            ServerHandlers.WaitingForPlayers -= OnWaitingForPlayers;
         }
 
         private void OnRoundStarted()
@@ -46,6 +48,12 @@ namespace Scp457.EventHandlers
 
             Player player = players[Random.Range(0, players.Count)];
             Scp457.Spawn(player);
+        }
+
+        private void OnWaitingForPlayers()
+        {
+            Scp457.Dictionary.Clear();
+            BurningHandler.Dictionary.Clear();
         }
     }
 }

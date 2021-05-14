@@ -30,7 +30,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the duration of the applied <see cref="CustomPlayerEffects.Flashed"/> effect.
         /// </summary>
-        public float FlashDuration { get; set; }
+        public float FlashDuration { get; set; } = 2f;
 
         /// <summary>
         /// Gets or sets the message to be sent to a user who is on cooldown.

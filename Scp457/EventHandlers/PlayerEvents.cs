@@ -22,6 +22,9 @@ namespace Scp457.EventHandlers
         /// </summary>
         public void SubscribeEvents()
         {
+            PlayerHandlers.ChangingRole += OnChangingRole;
+            PlayerHandlers.Died += OnDied;
+            PlayerHandlers.Destroying += OnDestroying;
             PlayerHandlers.Shot += OnShot;
             PlayerHandlers.Verified += OnVerified;
         }
@@ -31,8 +34,38 @@ namespace Scp457.EventHandlers
         /// </summary>
         public void UnsubscribeEvents()
         {
+            PlayerHandlers.ChangingRole -= OnChangingRole;
+            PlayerHandlers.Died -= OnDied;
+            PlayerHandlers.Destroying -= OnDestroying;
             PlayerHandlers.Shot -= OnShot;
             PlayerHandlers.Verified -= OnVerified;
+        }
+
+        private void OnChangingRole(ChangingRoleEventArgs ev)
+        {
+            if (BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
+                burningHandler.BurnTime = 0f;
+
+            if (Scp457.Get(ev.Player) is Scp457 scp457)
+                scp457.Destroy();
+        }
+
+        private void OnDestroying(DestroyingEventArgs ev)
+        {
+            if (BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
+                burningHandler.Destroy();
+
+            if (Scp457.Get(ev.Player) is Scp457 scp457)
+                scp457.Destroy();
+        }
+
+        private void OnDied(DiedEventArgs ev)
+        {
+            if (BurningHandler.Get(ev.Target) is BurningHandler burningHandler)
+                burningHandler.BurnTime = 0f;
+
+            if (Scp457.Get(ev.Target) is Scp457 scp457)
+                scp457.Destroy();
         }
 
         private void OnShot(ShotEventArgs ev)

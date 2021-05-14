@@ -22,7 +22,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the percentage chance that Scp457 will spawn in place of another Scp.
         /// </summary>
-        public float SpawnChance { get; set; } = 20;
+        public float SpawnChance { get; set; } = 20f;
 
         /// <summary>
         /// Gets or sets the <see cref="Exiled.API.Features.Player.Scale"/> of Scp457.
@@ -42,7 +42,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the radius around Scp457 where players who have line of sight.
         /// </summary>
-        public float BurnRadius { get; set; }
+        public float BurnRadius { get; set; } = 30f;
 
         /// <summary>
         /// Gets or sets the message to be displayed to a Scp457 when they spawn.

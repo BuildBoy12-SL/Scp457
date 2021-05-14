@@ -57,5 +57,13 @@ namespace Scp457.API
             Dictionary.TryGetValue(player, out BurningHandler burningHandler);
             return burningHandler;
         }
+
+        /// <summary>
+        /// Removes the <see cref="Player"/> from the handler.
+        /// </summary>
+        public void Destroy()
+        {
+            Dictionary.Remove(Player);
+        }
     }
 }
