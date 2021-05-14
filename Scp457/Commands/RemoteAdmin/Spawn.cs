@@ -51,7 +51,7 @@ namespace Scp457.Commands.RemoteAdmin
                 player = ply;
             }
 
-            if (Scp457.IsScp457(player, out _))
+            if (Scp457.Get(player) != null)
             {
                 response = $"{player.Nickname} is already a Scp457!";
                 return false;

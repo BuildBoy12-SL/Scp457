@@ -48,27 +48,24 @@ namespace Scp457.API
         /// <param name="player">The <see cref="Player"/> to be removed from being Scp457.</param>
         public static void Destroy(Player player)
         {
-            if (!IsScp457(player, out _))
+            if (Get(player) == null)
                 return;
 
             player.SessionVariables.Remove(SessionVariable);
         }
 
         /// <summary>
-        /// Determines if a given <see cref="Player"/> is a Scp457.
+        /// Gets a <see cref="Scp457"/> instance from a <see cref="Player"/>.
         /// </summary>
-        /// <param name="player">The <see cref="Player"/> to check for being a Scp457.</param>
-        /// <param name="scp457">The found <see cref="Scp457"/> instance.</param>
-        /// <returns>A value indicating whether the <see cref="Player"/> is a Scp457.</returns>
-        public static bool IsScp457(Player player, out Scp457 scp457)
+        /// <param name="player">The player to search.</param>
+        /// <returns>The <see cref="Scp457"/> instance or null.</returns>
+        public static Scp457 Get(Player player)
         {
             if (player == null)
-            {
-                scp457 = null;
-                return false;
-            }
+                return null;
 
-            return Dictionary.TryGetValue(player, out scp457);
+            Dictionary.TryGetValue(player, out Scp457 burningHandler);
+            return burningHandler;
         }
 
         /// <summary>
