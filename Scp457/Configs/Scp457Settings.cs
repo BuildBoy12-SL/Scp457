@@ -7,7 +7,7 @@
 
 namespace Scp457.Configs
 {
-    using Scp457.API.Features;
+    using Scp457.API;
 
     /// <summary>
     /// A set of configs to determine how Scp457 generally interacts.
