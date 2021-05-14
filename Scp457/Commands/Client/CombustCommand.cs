@@ -11,7 +11,9 @@ namespace Scp457.Commands.Client
     using CommandSystem;
     using Exiled.API.Features;
     using global::RemoteAdmin;
+    using Grenades;
     using Scp457.API;
+    using UnityEngine;
 
     /// <summary>
     /// Command for Scp457 to use their combust ability.
@@ -38,7 +40,12 @@ namespace Scp457.Commands.Client
                 return false;
             }
 
-            response = "";
+            Config config = Plugin.Instance.Config;
+            Grenade grenade = Methods.SpawnGrenade(player.Position, Vector3.zero, player, 0.1f);
+            if (grenade != null)
+                Methods.IgnoredGrenades.Add(grenade.gameObject);
+
+            response = config.CombustSettings.UsedMessage;
             return false;
         }
     }

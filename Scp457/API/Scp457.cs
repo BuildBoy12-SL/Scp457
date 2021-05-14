@@ -52,6 +52,7 @@ namespace Scp457.API
                 return;
 
             player.SessionVariables.Remove(SessionVariable);
+            Dictionary.Remove(player);
         }
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace Scp457.API
 
             player.ShowHint(config.Scp457Settings.SpawnMessage, config.Scp457Settings.SpawnMessageDuration);
             player.SessionVariables.Add(SessionVariable, true);
+            Dictionary.Add(player, new Scp457(player));
         }
     }
 }

@@ -31,5 +31,15 @@ namespace Scp457.Configs
         /// Gets or sets the duration of the applied <see cref="CustomPlayerEffects.Flashed"/> effect.
         /// </summary>
         public float FlashDuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message to be sent to a user who is on cooldown.
+        /// </summary>
+        public string CooldownMessage { get; set; } = "<color=red>Wait %seconds% to use that command again.</color>";
+
+        /// <summary>
+        /// Gets or sets the message to be sent when combustion executes successfully.
+        /// </summary>
+        public string UsedMessage { get; set; } = "<color=green>Done.</color>";
     }
 }

@@ -33,7 +33,7 @@ namespace Scp457.EventHandlers
 
         private void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
         {
-            if (State.IgnoredGrenades.Remove(ev.Grenade))
+            if (Methods.IgnoredGrenades.Remove(ev.Grenade))
                 ev.IsAllowed = false;
         }
     }
