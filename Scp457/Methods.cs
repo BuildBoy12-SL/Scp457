@@ -39,7 +39,7 @@ namespace Scp457
                 player = Server.Host;
 
             var component = player.GrenadeManager;
-            var component2 = UnityEngine.Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenade>();
+            var component2 = Object.Instantiate(component.availableGrenades[(int)grenadeType].grenadeInstance).GetComponent<Grenade>();
 
             component2.FullInitData(component, position, Quaternion.Euler(component2.throwStartAngle), velocity, component2.throwAngularVelocity, player == Server.Host ? Team.SCP : player.Team);
             component2.NetworkfuseTime = NetworkTime.time + fuseTime;

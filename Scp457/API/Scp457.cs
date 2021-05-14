@@ -49,6 +49,11 @@ namespace Scp457.API
         public Player Player { get; }
 
         /// <summary>
+        /// Gets or sets the cooldown of the combustion ability.
+        /// </summary>
+        public float CombustCooldown { get; set; }
+
+        /// <summary>
         /// Removes a player from being considered as Scp457.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> to be removed from being Scp457.</param>

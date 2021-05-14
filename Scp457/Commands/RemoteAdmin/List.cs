@@ -37,7 +37,7 @@ namespace Scp457.Commands.RemoteAdmin
                 return false;
             }
 
-            response = $"Alive Scp457s: {string.Join(", ", API.Scp457.List.Select(scp457 => scp457.Player.Nickname))}";
+            response = $"Alive Scp457s: {string.Join(", ", API.Scp457.Dictionary.Keys.Select(player => player.Nickname))}";
             return true;
         }
     }

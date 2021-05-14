@@ -40,6 +40,11 @@ namespace Scp457.API
         public Player Player { get; }
 
         /// <summary>
+        /// Gets or sets the remaining time for the player to burn.
+        /// </summary>
+        public float BurnTime { get; set; }
+
+        /// <summary>
         /// Gets a <see cref="BurningHandler"/> instance from a <see cref="Player"/>.
         /// </summary>
         /// <param name="player">The player to search.</param>

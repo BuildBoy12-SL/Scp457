@@ -9,6 +9,7 @@ namespace Scp457.Commands.Client
 {
     using System;
     using CommandSystem;
+    using CustomPlayerEffects;
     using Exiled.API.Features;
     using global::RemoteAdmin;
     using Grenades;
@@ -41,10 +42,34 @@ namespace Scp457.Commands.Client
             }
 
             Config config = Plugin.Instance.Config;
+            if (scp457.CombustCooldown > 0f)
+            {
+                response = config.CombustSettings.CooldownMessage.Replace("%seconds%", ((int)scp457.CombustCooldown).ToString());
+                return false;
+            }
+
             Grenade grenade = Methods.SpawnGrenade(player.Position, Vector3.zero, player, 0.1f);
             if (grenade != null)
                 Methods.IgnoredGrenades.Add(grenade.gameObject);
 
+            foreach (Player ply in Player.List)
+            {
+                if (ply.IsScp || ply.SessionVariables.ContainsKey("IsScp035"))
+                    continue;
+
+                BurningHandler burningHandler = BurningHandler.Get(ply);
+                if (burningHandler == null)
+                    continue;
+
+                float burnTime = burningHandler.BurnTime + config.CombustSettings.BurnDuration;
+                if (burnTime < config.BurnSettings.MaximumDuration)
+                    burningHandler.BurnTime = burnTime;
+
+                ply.Hurt(config.CombustSettings.Damage, DamageTypes.Asphyxiation, player.Nickname, player.Id);
+                ply.EnableEffect<Flashed>(config.CombustSettings.FlashDuration);
+            }
+
+            scp457.CombustCooldown = config.CombustSettings.Cooldown;
             response = config.CombustSettings.UsedMessage;
             return false;
         }
