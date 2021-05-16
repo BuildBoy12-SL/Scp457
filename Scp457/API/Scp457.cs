@@ -234,11 +234,23 @@ namespace Scp457.API
                                         || player.SessionVariables.ContainsKey("IsNPC"))
                         continue;
 
-                    if (Vector3.Distance(player.Position, Player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
+                    if (!(BurningHandler.Get(player) is BurningHandler burningHandler))
                         continue;
 
-                    if (!Physics.Linecast(Player.Position, player.Position, player.ReferenceHub.playerMovementSync.CollidableSurfaces))
-                        player.EnableEffect(EffectType.Burned, 0.2f);
+                    if (Vector3.Distance(player.Position, Player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
+                    {
+                        burningHandler.HasBurned = false;
+                        continue;
+                    }
+
+                    if (Physics.Linecast(Player.Position, player.Position, player.ReferenceHub.playerMovementSync.CollidableSurfaces))
+                    {
+                        burningHandler.HasBurned = false;
+                        continue;
+                    }
+
+                    player.EnableEffect(EffectType.Burned, 0.2f);
+                    burningHandler.HasBurned = true;
                 }
             }
         }

@@ -49,6 +49,11 @@ namespace Scp457.API
         public Scp457 LastAttacker { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="Player"/> is under the LOS <see cref="CustomPlayerEffects.Burned"/> effect.
+        /// </summary>
+        public bool HasBurned { get; set; }
+
+        /// <summary>
         /// Gets or sets the remaining time for the player to burn.
         /// </summary>
         public float BurnTime

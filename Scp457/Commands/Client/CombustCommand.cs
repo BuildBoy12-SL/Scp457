@@ -60,7 +60,7 @@ namespace Scp457.Commands.Client
                     continue;
 
                 BurningHandler burningHandler = BurningHandler.Get(ply);
-                if (burningHandler == null)
+                if (burningHandler == null || !burningHandler.HasBurned)
                     continue;
 
                 float burnTime = burningHandler.BurnTime + config.CombustSettings.BurnDuration;
