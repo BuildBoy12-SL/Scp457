@@ -20,6 +20,7 @@ namespace Scp457.API
     public class Scp457
     {
         private const string SessionVariable = "IsScp457";
+        private readonly List<Vector3> points = new List<Vector3>();
         private readonly CoroutineHandle updateBurn;
         private CoroutineHandle updateCooldown;
         private float combustionCooldown;
@@ -169,9 +170,17 @@ namespace Scp457.API
         public void TryAttack()
         {
             Vector3 forward = Player.CameraTransform.forward;
-            Ray ray = new Ray(Player.CameraTransform.position + forward, forward);
+            Vector3 cameraPosition = Player.CameraTransform.position;
+            Ray ray = new Ray(cameraPosition + forward, forward);
 
             WeaponManager weaponManager = Player.ReferenceHub.weaponManager;
+
+            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+            {
+                Vector3 endPoint = cameraPosition + (forward * Plugin.Instance.Config.AttackSettings.Distance);
+                bool hit = Physics.Linecast(cameraPosition, endPoint, out var hitInfo, weaponManager.raycastMask);
+                DrawAttack(hit ? hitInfo.point : endPoint);
+            }
 
             if (!Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, weaponManager.raycastMask))
                 return;
@@ -218,6 +227,25 @@ namespace Scp457.API
             burningHandler.BurnTime = burnTime;
             target.Hurt(config.AttackSettings.Damage, DamageTypes.Asphyxiation, Player.Nickname, Player.Id);
             Scp0492PlayerScript.TargetHitMarker(Player.Connection);
+        }
+
+        private void DrawAttack(Vector3 target)
+        {
+            float distance = Vector3.Distance(Player.CameraTransform.position, target);
+            while (distance > 0)
+            {
+                points.Add((Player.CameraTransform.forward * distance) + Player.CameraTransform.position);
+                distance -= Plugin.Instance.Config.AttackSettings.OrbSpacing;
+            }
+
+            Log.Debug("Points Plotted:\n" + string.Join(", ", points), Plugin.Instance.Config.ShowDebug);
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                Player.ReferenceHub.weaponManager.RpcPlaceDecal(false, 1, points[i], Quaternion.FromToRotation(Vector3.up, Player.Rotation));
+            }
+
+            points.Clear();
         }
 
         private IEnumerator<float> UpdateBurn()

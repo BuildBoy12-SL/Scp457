@@ -26,5 +26,15 @@ namespace Scp457.Configs
         /// Gets or sets the duration, in seconds, of the applied burning effect.
         /// </summary>
         public float BurnDuration { get; set; } = 10f;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a line should be drawn when Scp457 attacks.
+        /// </summary>
+        public bool ShowAttack { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the spacing of the drawn markers.
+        /// </summary>
+        public float OrbSpacing { get; set; } = 1f;
     }
 }

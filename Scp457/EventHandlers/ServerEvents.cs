@@ -24,6 +24,7 @@ namespace Scp457.EventHandlers
         /// </summary>
         public void SubscribeEvents()
         {
+            ServerHandlers.ReloadedConfigs += OnReloadedConfigs;
             ServerHandlers.RoundStarted += OnRoundStarted;
             ServerHandlers.WaitingForPlayers += OnWaitingForPlayers;
         }
@@ -33,8 +34,18 @@ namespace Scp457.EventHandlers
         /// </summary>
         public void UnsubscribeEvents()
         {
+            ServerHandlers.ReloadedConfigs -= OnReloadedConfigs;
             ServerHandlers.RoundStarted -= OnRoundStarted;
             ServerHandlers.WaitingForPlayers -= OnWaitingForPlayers;
+        }
+
+        private void OnReloadedConfigs()
+        {
+            if (Plugin.Instance.Config.AttackSettings.OrbSpacing <= 0f)
+            {
+                Plugin.Instance.Config.AttackSettings.OrbSpacing = 0.5f;
+                Log.Warn("Do not set the Orb Spacing to 0 or less than 0! Reverted to default value.");
+            }
         }
 
         private void OnRoundStarted()
