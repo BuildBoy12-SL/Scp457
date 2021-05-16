@@ -39,7 +39,7 @@ namespace Scp457.EventHandlers
 
         private void OnRoundStarted()
         {
-            if (Plugin.Instance.Config.Scp457Settings.SpawnChance < Random.Range(0, 100))
+            if (Plugin.Instance.Config.Scp457Settings.SpawnChance <= Random.Range(0, 100))
                 return;
 
             List<Player> players = Player.List.Where(x => x.Team == Team.SCP).ToList();

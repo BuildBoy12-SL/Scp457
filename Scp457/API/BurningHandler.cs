@@ -16,7 +16,7 @@ namespace Scp457.API
     /// </summary>
     public class BurningHandler
     {
-        private CoroutineHandle coroutine;
+        private CoroutineHandle burn;
         private float burnTime;
 
         /// <summary>
@@ -44,6 +44,11 @@ namespace Scp457.API
         public Player Player { get; }
 
         /// <summary>
+        /// Gets or sets the Scp457 that attacked the <see cref="Player"/> last.
+        /// </summary>
+        public Scp457 LastAttacker { get; set; }
+
+        /// <summary>
         /// Gets or sets the remaining time for the player to burn.
         /// </summary>
         public float BurnTime
@@ -51,8 +56,12 @@ namespace Scp457.API
             get => burnTime;
             set
             {
-                if (burnTime == 0f && value > 0f)
-                    coroutine = Timing.RunCoroutine(Burn());
+                if (burnTime <= 0f && value > 0f)
+                {
+                    burnTime = value;
+                    burn = Timing.RunCoroutine(Burn());
+                    return;
+                }
 
                 burnTime = value;
             }
@@ -77,7 +86,7 @@ namespace Scp457.API
         /// </summary>
         public void Destroy()
         {
-            Timing.KillCoroutines(coroutine);
+            Timing.KillCoroutines(burn);
             Dictionary.Remove(Player);
         }
 
@@ -87,20 +96,25 @@ namespace Scp457.API
         /// <returns>An internal delay.</returns>
         private IEnumerator<float> Burn()
         {
+            Log.Debug($"Starting burn sequence for {Player.Nickname}.", Plugin.Instance.Config.ShowDebug);
             while (BurnTime > 0f)
             {
-                if (Player.IsGodModeEnabled)
+                if (Player.IsGodModeEnabled || LastAttacker?.Scp0492PlayerScript == null
+                                            || LastAttacker?.Player == null)
                 {
-                    BurnTime = 0f;
-                    yield break;
+                    Log.Debug($"{Player.Nickname} is in god mode or required logic is null, ending burn sequence.", Plugin.Instance.Config.ShowDebug);
+                    break;
                 }
 
                 Player.Hurt(Plugin.Instance.Config.BurnSettings.Damage, DamageTypes.Asphyxiation, "SCP457");
+                LastAttacker.Scp0492PlayerScript.TargetHitMarker(LastAttacker.Player.Connection);
                 BurnTime -= Plugin.Instance.Config.BurnSettings.TickDuration;
+                Log.Debug($"Damaged {Player.Nickname} on burn, waiting for tick duration.", Plugin.Instance.Config.ShowDebug);
                 yield return Timing.WaitForSeconds(Plugin.Instance.Config.BurnSettings.TickDuration);
             }
 
             BurnTime = 0f;
+            Log.Debug($"Ended burn sequence for {Player.Nickname}.", Plugin.Instance.Config.ShowDebug);
         }
     }
 }

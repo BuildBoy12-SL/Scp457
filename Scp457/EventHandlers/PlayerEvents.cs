@@ -7,8 +7,11 @@
 
 namespace Scp457.EventHandlers
 {
+    using Exiled.API.Features;
     using Exiled.Events.EventArgs;
+    using Interactables.Interobjects.DoorUtils;
     using Scp457.API;
+    using UnityEngine;
     using PlayerHandlers = Exiled.Events.Handlers.Player;
 
     /// <summary>
@@ -26,6 +29,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.Destroying += OnDestroying;
             PlayerHandlers.MedicalItemUsed += OnMedicalItemUsed;
             PlayerHandlers.Shot += OnShot;
+            PlayerHandlers.Spawning += OnSpawning;
             PlayerHandlers.Verified += OnVerified;
         }
 
@@ -39,6 +43,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.Destroying -= OnDestroying;
             PlayerHandlers.MedicalItemUsed -= OnMedicalItemUsed;
             PlayerHandlers.Shot -= OnShot;
+            PlayerHandlers.Spawning -= OnSpawning;
             PlayerHandlers.Verified -= OnVerified;
         }
 
@@ -46,9 +51,6 @@ namespace Scp457.EventHandlers
         {
             if (BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
                 burningHandler.BurnTime = 0f;
-
-            if (Scp457.Get(ev.Player) is Scp457 scp457)
-                scp457.Destroy();
         }
 
         private void OnDestroying(DestroyingEventArgs ev)
@@ -80,6 +82,28 @@ namespace Scp457.EventHandlers
         {
             if (Scp457.Get(ev.Target) != null && ev.HitboxTypeEnum == HitBoxType.HEAD)
                 ev.Damage /= 4;
+        }
+
+        private void OnSpawning(SpawningEventArgs ev)
+        {
+            if (!(Scp457.Get(ev.Player) is Scp457 scp457))
+                return;
+
+            if (ev.RoleType != RoleType.Scp0492)
+            {
+                scp457.Destroy();
+                return;
+            }
+
+            DoorVariant door = Map.GetDoorByName(Plugin.Instance.Config.Scp457Settings.SpawnDoor);
+            if (door == null)
+            {
+                Log.Error("Could not find the spawn door for Scp457!");
+                return;
+            }
+
+            if (PlayerMovementSync.FindSafePosition(door.transform.position, out Vector3 pos, true))
+                ev.Position = pos;
         }
 
         private void OnVerified(VerifiedEventArgs ev)

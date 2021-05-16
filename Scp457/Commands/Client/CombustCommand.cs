@@ -54,7 +54,9 @@ namespace Scp457.Commands.Client
 
             foreach (Player ply in Player.List)
             {
-                if (ply.IsScp || ply.SessionVariables.ContainsKey("IsScp035"))
+                if (ply.IsScp || ply.SessionVariables.ContainsKey("IsScp035")
+                              || ply.SessionVariables.ContainsKey("IsGhostSpectator")
+                              || ply.SessionVariables.ContainsKey("IsNPC"))
                     continue;
 
                 BurningHandler burningHandler = BurningHandler.Get(ply);
@@ -65,6 +67,8 @@ namespace Scp457.Commands.Client
                 if (burnTime > config.BurnSettings.MaximumDuration)
                     burnTime = config.BurnSettings.MaximumDuration;
 
+                burningHandler.LastAttacker = scp457;
+                burningHandler.BurnTime = burnTime;
                 ply.Hurt(config.CombustSettings.Damage, DamageTypes.Asphyxiation, player.Nickname, player.Id);
                 ply.EnableEffect<Flashed>(config.CombustSettings.FlashDuration);
             }

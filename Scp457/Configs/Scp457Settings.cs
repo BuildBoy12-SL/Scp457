@@ -35,9 +35,9 @@ namespace Scp457.Configs
         };
 
         /// <summary>
-        /// Gets or sets the name of the room that the Scp will spawn in.
+        /// Gets or sets the name of the door that the Scp will spawn in.
         /// </summary>
-        public string SpawnRoom { get; set; } = "HCZ_ARMORY";
+        public string SpawnDoor { get; set; } = "HCZ_ARMORY";
 
         /// <summary>
         /// Gets or sets the radius around Scp457 where players who have line of sight.

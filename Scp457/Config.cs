@@ -16,6 +16,11 @@ namespace Scp457
         /// <inheritdoc/>
         public bool IsEnabled { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether debug messages should be shown.
+        /// </summary>
+        public bool ShowDebug { get; set; } = true;
+
         /// <inheritdoc cref="Configs.AttackSettings"/>
         public AttackSettings AttackSettings { get; set; } = new AttackSettings();
 

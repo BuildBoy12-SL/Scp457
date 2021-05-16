@@ -35,7 +35,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the message to be sent to a user who is on cooldown.
         /// </summary>
-        public string CooldownMessage { get; set; } = "<color=red>Wait %seconds% to use that command again.</color>";
+        public string CooldownMessage { get; set; } = "<color=red>Wait %seconds% second(s) to use that command again.</color>";
 
         /// <summary>
         /// Gets or sets the message to be sent when combustion executes successfully.

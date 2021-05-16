@@ -8,7 +8,9 @@
 namespace Scp457.API
 {
     using System.Collections.Generic;
+    using Exiled.API.Enums;
     using Exiled.API.Features;
+    using MEC;
     using Mirror;
     using UnityEngine;
 
@@ -18,6 +20,9 @@ namespace Scp457.API
     public class Scp457
     {
         private const string SessionVariable = "IsScp457";
+        private readonly CoroutineHandle updateBurn;
+        private CoroutineHandle updateCooldown;
+        private float combustionCooldown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Scp457"/> class.
@@ -26,6 +31,9 @@ namespace Scp457.API
         private Scp457(Player player)
         {
             Player = player;
+            Scp0492PlayerScript = player.GameObject.GetComponent<Scp049_2PlayerScript>();
+            updateBurn = Timing.RunCoroutine(UpdateBurn());
+            Log.Debug($"Instantiated {Player.Nickname} as a Scp457.", Plugin.Instance.Config.ShowDebug);
         }
 
         /// <summary>
@@ -49,9 +57,28 @@ namespace Scp457.API
         public Player Player { get; }
 
         /// <summary>
+        /// Gets the <see cref="Player"/>'s <see cref="Scp049_2PlayerScript"/>.
+        /// </summary>
+        public Scp049_2PlayerScript Scp0492PlayerScript { get; }
+
+        /// <summary>
         /// Gets or sets the cooldown of the combustion ability.
         /// </summary>
-        public float CombustCooldown { get; set; }
+        public float CombustCooldown
+        {
+            get => combustionCooldown;
+            set
+            {
+                if (combustionCooldown == 0f && value > 0f)
+                {
+                    combustionCooldown = value;
+                    updateCooldown = Timing.RunCoroutine(UpdateCooldown());
+                    return;
+                }
+
+                combustionCooldown = value;
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="Scp457"/> instance from a <see cref="Player"/>.
@@ -102,6 +129,8 @@ namespace Scp457.API
             if (player == null)
                 return;
 
+            Dictionary.Add(player, new Scp457(player));
+
             player.Role = RoleType.Scp0492;
 
             Config config = Plugin.Instance.Config;
@@ -117,7 +146,6 @@ namespace Scp457.API
 
             player.ShowHint(config.Scp457Settings.SpawnMessage, config.Scp457Settings.SpawnMessageDuration);
             player.SessionVariables.Add(SessionVariable, true);
-            Dictionary.Add(player, new Scp457(player));
         }
 
         /// <summary>
@@ -125,11 +153,14 @@ namespace Scp457.API
         /// </summary>
         public void Destroy()
         {
+            Timing.KillCoroutines(updateBurn);
+            Timing.KillCoroutines(updateCooldown);
             Player.SessionVariables.Remove(SessionVariable);
             Dictionary.Remove(Player);
             Player.Scale = Vector3.one;
             Player.CustomInfo = string.Empty;
             Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
+            Log.Debug($"Destroyed {Player.Nickname}'s Scp457 instance.", Plugin.Instance.Config.ShowDebug);
         }
 
         /// <summary>
@@ -142,14 +173,23 @@ namespace Scp457.API
 
             WeaponManager weaponManager = Player.ReferenceHub.weaponManager;
 
-            bool hit = Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, weaponManager.raycastMask);
-
-            if (!hit)
+            if (!Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, weaponManager.raycastMask))
                 return;
 
             Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
-            if (target == null || target.IsScp || target.SessionVariables.ContainsKey("IsScp035"))
+            if (target == null)
+            {
+                PlaceBlood(Player, raycastHit.point);
                 return;
+            }
+
+            if (target.IsScp || target.SessionVariables.ContainsKey("IsScp035")
+                             || target.SessionVariables.ContainsKey("IsGhostSpectator")
+                             || target.SessionVariables.ContainsKey("IsNPC"))
+            {
+                PlaceBlood(Player, target.Position);
+                return;
+            }
 
             if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
             {
@@ -174,8 +214,44 @@ namespace Scp457.API
             if (burnTime > Plugin.Instance.Config.BurnSettings.MaximumDuration)
                 burnTime = Plugin.Instance.Config.BurnSettings.MaximumDuration;
 
+            burningHandler.LastAttacker = this;
             burningHandler.BurnTime = burnTime;
             target.Hurt(config.AttackSettings.Damage, DamageTypes.Asphyxiation, Player.Nickname, Player.Id);
+            Scp0492PlayerScript.TargetHitMarker(Player.Connection);
+        }
+
+        private IEnumerator<float> UpdateBurn()
+        {
+            while (true)
+            {
+                yield return Timing.WaitForSeconds(0.1f);
+
+                foreach (Player player in Player.List)
+                {
+                    if (!player.IsAlive || player.IsScp
+                                        || player.SessionVariables.ContainsKey("IsScp035")
+                                        || player.SessionVariables.ContainsKey("IsGhostSpectator")
+                                        || player.SessionVariables.ContainsKey("IsNPC"))
+                        continue;
+
+                    if (Vector3.Distance(player.Position, Player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
+                        continue;
+
+                    if (!Physics.Linecast(Player.Position, player.Position, player.ReferenceHub.playerMovementSync.CollidableSurfaces))
+                        player.EnableEffect(EffectType.Burned, 0.2f);
+                }
+            }
+        }
+
+        private IEnumerator<float> UpdateCooldown()
+        {
+            while (CombustCooldown > 0f)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                CombustCooldown--;
+            }
+
+            CombustCooldown = 0f;
         }
     }
 }
