@@ -57,7 +57,7 @@ Configs for the spawning of Scp035 item instances.
 | burn_duration | Float | 10 | The duration, in seconds, of the applied burning effect. |
 | flash_duration | Float | 2 | Whether a Scp035 item instance will spawn when a Scp035 host dies. |
 | cooldown_message | String | <color=red>Wait %seconds% second(s) to use that command again.<\/color> | The message to be sent to a user who is on cooldown. |
-| used_message | String | <color=green>Done.</color> | The message to be sent when combustion executes successfully. |
+| used_message | String | <color=green>Done.<\/color> | The message to be sent when combustion executes successfully. |
 
 ## Scp457
 Configs for the display of a notification to users looking at a Scp035 instance.
