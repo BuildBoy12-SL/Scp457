@@ -52,7 +52,7 @@ namespace Scp457.Commands.RemoteAdmin
                     : command.Command);
             }
 
-            response = StringBuilderPool.Shared.ToStringReturn(stringBuilder);
+            response = StringBuilderPool.Shared.ToStringReturn(stringBuilder).TrimEnd();
             return false;
         }
     }

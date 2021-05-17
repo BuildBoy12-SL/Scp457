@@ -23,7 +23,7 @@ namespace Scp457.API
         private readonly List<Vector3> points = new List<Vector3>();
         private readonly CoroutineHandle updateBurn;
         private CoroutineHandle updateCooldown;
-        private float combustionCooldown;
+        private int combustionCooldown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Scp457"/> class.
@@ -65,12 +65,12 @@ namespace Scp457.API
         /// <summary>
         /// Gets or sets the cooldown of the combustion ability.
         /// </summary>
-        public float CombustCooldown
+        public int CombustCooldown
         {
             get => combustionCooldown;
             set
             {
-                if (combustionCooldown == 0f && value > 0f)
+                if (combustionCooldown <= 0 && value > 0)
                 {
                     combustionCooldown = value;
                     updateCooldown = Timing.RunCoroutine(UpdateCooldown());
@@ -186,32 +186,26 @@ namespace Scp457.API
                 return;
 
             Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
-            if (target == null)
-            {
-                PlaceBlood(Player, raycastHit.point);
+            if (target == null || !IsTargetable(target))
                 return;
-            }
-
-            if (target.IsScp || target.SessionVariables.ContainsKey("IsScp035")
-                             || target.SessionVariables.ContainsKey("IsGhostSpectator")
-                             || target.SessionVariables.ContainsKey("IsNPC"))
-            {
-                PlaceBlood(Player, target.Position);
-                return;
-            }
 
             if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
             {
                 RunAttack(target);
-                PlaceBlood(Player, target.Position);
-                return;
+                PlaceBlood(target.Position);
             }
-
-            PlaceBlood(Player, raycastHit.point);
         }
 
-        private static void PlaceBlood(Player attacker, Vector3 position) =>
-            attacker.ReferenceHub.characterClassManager.RpcPlaceBlood(position, 1, 2);
+        private static bool IsTargetable(Player player)
+        {
+            return player.IsAlive && !player.IsScp
+                                  && !player.SessionVariables.ContainsKey("IsScp035")
+                                  && !player.SessionVariables.ContainsKey("IsGhostSpectator")
+                                  && !player.SessionVariables.ContainsKey("IsNPC");
+        }
+
+        private void PlaceBlood(Vector3 position) =>
+            Player.ReferenceHub.characterClassManager.RpcPlaceBlood(position, 1, 2);
 
         private void RunAttack(Player target)
         {
@@ -256,10 +250,7 @@ namespace Scp457.API
 
                 foreach (Player player in Player.List)
                 {
-                    if (!player.IsAlive || player.IsScp
-                                        || player.SessionVariables.ContainsKey("IsScp035")
-                                        || player.SessionVariables.ContainsKey("IsGhostSpectator")
-                                        || player.SessionVariables.ContainsKey("IsNPC"))
+                    if (!IsTargetable(player))
                         continue;
 
                     if (!(BurningHandler.Get(player) is BurningHandler burningHandler))
@@ -285,13 +276,11 @@ namespace Scp457.API
 
         private IEnumerator<float> UpdateCooldown()
         {
-            while (CombustCooldown > 0f)
+            while (CombustCooldown > 0)
             {
                 yield return Timing.WaitForSeconds(1f);
                 CombustCooldown--;
             }
-
-            CombustCooldown = 0f;
         }
     }
 }

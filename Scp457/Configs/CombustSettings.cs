@@ -15,7 +15,7 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the amount of seconds between uses.
         /// </summary>
-        public float Cooldown { get; set; } = 30f;
+        public int Cooldown { get; set; } = 30;
 
         /// <summary>
         /// Gets or sets the initial damage of the explosion.
