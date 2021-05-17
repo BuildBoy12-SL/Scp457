@@ -44,7 +44,7 @@ namespace Scp457.Commands.Client
             Config config = Plugin.Instance.Config;
             if (scp457.CombustCooldown > 0f)
             {
-                response = config.CombustSettings.CooldownMessage.Replace("%seconds%", ((int)scp457.CombustCooldown).ToString());
+                response = config.CombustSettings.CooldownMessage.Replace("%seconds%", scp457.CombustCooldown.ToString());
                 return false;
             }
 
