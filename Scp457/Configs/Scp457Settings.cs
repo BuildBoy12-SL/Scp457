@@ -40,7 +40,7 @@ namespace Scp457.Configs
         public string SpawnDoor { get; set; } = "HCZ_ARMORY";
 
         /// <summary>
-        /// Gets or sets the radius around Scp457 where players who have line of sight.
+        /// Gets or sets the radius around Scp457 where players who have line of sight will have the burned effect applied.
         /// </summary>
         public float BurnRadius { get; set; } = 30f;
 
