@@ -7,6 +7,7 @@
 
 namespace Scp457.API
 {
+    using System;
     using System.Collections.Generic;
     using Exiled.API.Enums;
     using Exiled.API.Features;
@@ -20,7 +21,9 @@ namespace Scp457.API
     public class Scp457
     {
         private const string SessionVariable = "IsScp457";
+        private static readonly int WallMask = LayerMask.GetMask("Default", "Door", "Glass");
         private readonly List<Vector3> points = new List<Vector3>();
+        private readonly RaycastHit[] hits = new RaycastHit[20];
         private readonly CoroutineHandle updateBurn;
         private CoroutineHandle updateCooldown;
         private int combustionCooldown;
@@ -32,7 +35,7 @@ namespace Scp457.API
         private Scp457(Player player)
         {
             Player = player;
-            Scp0492PlayerScript = player.GameObject.GetComponent<Scp049_2PlayerScript>();
+            Scp0492PlayerScript = Player.GameObject.GetComponent<Scp049_2PlayerScript>();
             updateBurn = Timing.RunCoroutine(UpdateBurn());
             Log.Debug($"Instantiated {Player.Nickname} as a Scp457.", Plugin.Instance.Config.ShowDebug);
         }
@@ -167,33 +170,21 @@ namespace Scp457.API
         /// <summary>
         /// Handles the attack logic for the <see cref="Scp457"/>.
         /// </summary>
-        public void TryAttack()
+        public void Attack()
         {
             Vector3 forward = Player.CameraTransform.forward;
             Vector3 cameraPosition = Player.CameraTransform.position;
+
             Ray ray = new Ray(cameraPosition + forward, forward);
+            Vector3 endPoint = cameraPosition + (forward * Plugin.Instance.Config.AttackSettings.Distance);
 
-            WeaponManager weaponManager = Player.ReferenceHub.weaponManager;
-
-            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+            if (Plugin.Instance.Config.AttackSettings.Pierce)
             {
-                Vector3 endPoint = cameraPosition + (forward * Plugin.Instance.Config.AttackSettings.Distance);
-                bool hit = Physics.Linecast(cameraPosition, endPoint, out var hitInfo, weaponManager.raycastMask);
-                DrawAttack(hit ? hitInfo.point : endPoint);
+                TryPierceAttack(ray, endPoint);
+                return;
             }
 
-            if (!Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, weaponManager.raycastMask))
-                return;
-
-            Player target = Player.Get(raycastHit.collider.GetComponentInParent<NetworkIdentity>().gameObject);
-            if (target == null || !IsTargetable(target))
-                return;
-
-            if (weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
-            {
-                RunAttack(target);
-                PlaceBlood(target.Position);
-            }
+            TryAttack(ray, endPoint);
         }
 
         private static bool IsTargetable(Player player)
@@ -204,8 +195,43 @@ namespace Scp457.API
                                   && !player.SessionVariables.ContainsKey("IsNPC");
         }
 
-        private void PlaceBlood(Vector3 position) =>
-            Player.ReferenceHub.characterClassManager.RpcPlaceBlood(position, 1, 2);
+        private void TryAttack(Ray ray, Vector3 endPoint)
+        {
+            bool hit = Physics.Raycast(ray, out var raycastHit, Plugin.Instance.Config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
+
+            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+                DrawAttack(hit ? raycastHit.point : endPoint);
+
+            if (hit)
+                TryHit(raycastHit);
+        }
+
+        private void TryPierceAttack(Ray ray, Vector3 endPoint)
+        {
+            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+            {
+                bool hit = Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
+                DrawAttack(hit ? raycastHit.point : endPoint);
+            }
+
+            int hitCount = Physics.RaycastNonAlloc(ray, hits, Plugin.Instance.Config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
+            for (int i = 0; i < hitCount; i++)
+                TryHit(hits[i]);
+        }
+
+        private void TryHit(RaycastHit raycastHit)
+        {
+            var netIdentity = raycastHit.collider.GetComponentInParent<NetworkIdentity>();
+            if (netIdentity == null)
+                return;
+
+            Player target = Player.Get(netIdentity.gameObject);
+            if (target == null || !IsTargetable(target))
+                return;
+
+            if (Player.ReferenceHub.weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
+                RunAttack(target);
+        }
 
         private void RunAttack(Player target)
         {
@@ -221,6 +247,7 @@ namespace Scp457.API
             burningHandler.BurnTime = burnTime;
             target.Hurt(config.AttackSettings.Damage, DamageTypes.Asphyxiation, Player.Nickname, Player.Id);
             Scp0492PlayerScript.TargetHitMarker(Player.Connection);
+            Player.ReferenceHub.characterClassManager.RpcPlaceBlood(target.Position, 1, 2);
         }
 
         private void DrawAttack(Vector3 target)
@@ -231,8 +258,6 @@ namespace Scp457.API
                 points.Add((Player.CameraTransform.forward * distance) + Player.CameraTransform.position);
                 distance -= Plugin.Instance.Config.AttackSettings.OrbSpacing;
             }
-
-            Log.Debug("Points Plotted:\n" + string.Join(", ", points), Plugin.Instance.Config.ShowDebug);
 
             for (int i = 0; i < points.Count; i++)
             {
@@ -256,7 +281,7 @@ namespace Scp457.API
                     if (!(BurningHandler.Get(player) is BurningHandler burningHandler))
                         continue;
 
-                    if (Vector3.Distance(player.Position, Player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
+                    if (Vector3.Distance(Player.Position, player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
                     {
                         burningHandler.HasBurned = false;
                         continue;

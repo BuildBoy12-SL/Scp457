@@ -23,6 +23,11 @@ namespace Scp457.Configs
         public float Distance { get; set; } = 150f;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the attack can hit multiple targets at once.
+        /// </summary>
+        public bool Pierce { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the duration, in seconds, of the applied burning effect.
         /// </summary>
         public float BurnDuration { get; set; } = 10f;
