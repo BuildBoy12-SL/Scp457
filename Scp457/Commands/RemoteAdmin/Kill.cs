@@ -8,9 +8,7 @@
 namespace Scp457.Commands.RemoteAdmin
 {
     using System;
-    using System.Linq;
     using CommandSystem;
-    using Exiled.API.Features;
     using Exiled.Permissions.Extensions;
 
     /// <summary>
@@ -38,8 +36,8 @@ namespace Scp457.Commands.RemoteAdmin
                 return false;
             }
 
-            foreach (Player player in API.Scp457.List.Select(scp457 => scp457.Player))
-                player.Kill();
+            foreach (var scp457 in API.Scp457.List)
+                scp457.Player.Kill();
 
             response = "Killed all Scp457s successfully.";
             return true;

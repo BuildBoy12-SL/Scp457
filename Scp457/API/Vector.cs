@@ -7,12 +7,14 @@
 
 namespace Scp457.API
 {
+    using System;
     using UnityEngine;
 
     /// <summary>
     /// Used to be serialized and read from a config in place of a <see cref="Vector3"/>.
     /// </summary>
-    public class Vector
+    [Serializable]
+    public struct Vector
     {
         /// <summary>
         /// Gets or sets the abscissa axis value.
@@ -32,7 +34,7 @@ namespace Scp457.API
         /// <summary>
         /// Returns an instance of the <see cref="Vector"/> class as a <see cref="Vector3"/> for alternative uses.
         /// </summary>
-        /// <returns>A <see cref="Vector3"/> with identical <see cref="X"/>, <see cref="Y"/>, and <see cref="Z"/> values.</returns>
+        /// <returns>A <see cref="Vector3"/> with identical coordinate values.</returns>
         public Vector3 ToVector3() => new Vector3(X, Y, Z);
     }
 }
