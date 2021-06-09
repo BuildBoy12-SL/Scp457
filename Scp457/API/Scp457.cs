@@ -197,7 +197,7 @@ namespace Scp457.API
 
         private void TryAttack(Ray ray, Vector3 endPoint)
         {
-            bool hit = Physics.Raycast(ray, out var raycastHit, Plugin.Instance.Config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
+            bool hit = Physics.Raycast(ray, out var raycastHit, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
 
             if (Plugin.Instance.Config.AttackSettings.ShowAttack)
                 DrawAttack(hit ? raycastHit.point : endPoint);
@@ -214,7 +214,7 @@ namespace Scp457.API
                 DrawAttack(hit ? raycastHit.point : endPoint);
             }
 
-            int hitCount = Physics.RaycastNonAlloc(ray, hits, Plugin.Instance.Config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
+            int hitCount = Physics.RaycastNonAlloc(ray, hits, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
             for (int i = 0; i < hitCount; i++)
                 TryHit(hits[i]);
         }

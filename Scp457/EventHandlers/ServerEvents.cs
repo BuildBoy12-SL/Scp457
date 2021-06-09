@@ -56,7 +56,7 @@ namespace Scp457.EventHandlers
                 if (Plugin.Instance.Config.Scp457Settings.SpawnChance <= Random.Range(0, 100))
                     return;
 
-                List<Player> players = Player.List.Where(x => x.Team == Team.SCP).ToList();
+                List<Player> players = Player.List.Where(x => x.Team == Team.SCP && !x.SessionVariables.ContainsKey("IsNPC")).ToList();
                 if (players.Count == 0)
                     return;
 
