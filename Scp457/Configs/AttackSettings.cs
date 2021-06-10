@@ -33,6 +33,11 @@ namespace Scp457.Configs
         public float BurnDuration { get; set; } = 10f;
 
         /// <summary>
+        /// Gets or sets a value indicating whether blood should be placed where an attack lands.
+        /// </summary>
+        public bool PlaceBlood { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether a line should be drawn when Scp457 attacks.
         /// </summary>
         public bool ShowAttack { get; set; } = true;

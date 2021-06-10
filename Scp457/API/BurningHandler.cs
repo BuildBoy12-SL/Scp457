@@ -49,7 +49,7 @@ namespace Scp457.API
         public Scp457 LastAttacker { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="Player"/> is under the LOS <see cref="CustomPlayerEffects.Burned"/> effect.
+        /// Gets or sets a value indicating whether the <see cref="Player"/> is under the line of sight <see cref="CustomPlayerEffects.Burned"/> effect.
         /// </summary>
         public bool HasBurned { get; set; }
 
@@ -104,8 +104,9 @@ namespace Scp457.API
             Log.Debug($"Starting burn sequence for {Player.Nickname}.", Plugin.Instance.Config.ShowDebug);
             while (BurnTime > 0f)
             {
-                if (Player.IsGodModeEnabled || LastAttacker?.Scp0492PlayerScript == null
-                                            || LastAttacker?.Player == null)
+                if (Player.IsGodModeEnabled || LastAttacker == null
+                                            || LastAttacker.Scp0492PlayerScript == null
+                                            || LastAttacker.Player == null)
                 {
                     Log.Debug($"{Player.Nickname} is in god mode or required logic is null, ending burn sequence.", Plugin.Instance.Config.ShowDebug);
                     break;

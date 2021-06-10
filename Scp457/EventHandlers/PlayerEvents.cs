@@ -17,12 +17,12 @@ namespace Scp457.EventHandlers
     /// <summary>
     /// All event handlers which use <see cref="Exiled.Events.Handlers.Player"/>.
     /// </summary>
-    public class PlayerEvents
+    public static class PlayerEvents
     {
         /// <summary>
         /// Handles all subscriptions.
         /// </summary>
-        public void SubscribeEvents()
+        public static void SubscribeEvents()
         {
             PlayerHandlers.ChangingRole += OnChangingRole;
             PlayerHandlers.Died += OnDied;
@@ -36,7 +36,7 @@ namespace Scp457.EventHandlers
         /// <summary>
         /// Handles all unsubscribing.
         /// </summary>
-        public void UnsubscribeEvents()
+        public static void UnsubscribeEvents()
         {
             PlayerHandlers.ChangingRole -= OnChangingRole;
             PlayerHandlers.Died -= OnDied;
@@ -47,13 +47,13 @@ namespace Scp457.EventHandlers
             PlayerHandlers.Verified -= OnVerified;
         }
 
-        private void OnChangingRole(ChangingRoleEventArgs ev)
+        private static void OnChangingRole(ChangingRoleEventArgs ev)
         {
             if (BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
                 burningHandler.BurnTime = 0f;
         }
 
-        private void OnDestroying(DestroyingEventArgs ev)
+        private static void OnDestroying(DestroyingEventArgs ev)
         {
             if (BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
                 burningHandler.Destroy();
@@ -62,7 +62,7 @@ namespace Scp457.EventHandlers
                 scp457.Destroy();
         }
 
-        private void OnDied(DiedEventArgs ev)
+        private static void OnDied(DiedEventArgs ev)
         {
             if (BurningHandler.Get(ev.Target) is BurningHandler burningHandler)
                 burningHandler.BurnTime = 0f;
@@ -71,20 +71,20 @@ namespace Scp457.EventHandlers
                 scp457.Destroy();
         }
 
-        private void OnMedicalItemUsed(UsedMedicalItemEventArgs ev)
+        private static void OnMedicalItemUsed(UsedMedicalItemEventArgs ev)
         {
             if (Plugin.Instance.Config.BurnSettings.HealedBy.Contains(ev.Item) &&
                 BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
                 burningHandler.BurnTime = 0f;
         }
 
-        private void OnShot(ShotEventArgs ev)
+        private static void OnShot(ShotEventArgs ev)
         {
             if (Scp457.Get(ev.Target) != null && ev.HitboxTypeEnum == HitBoxType.HEAD)
                 ev.Damage /= 4;
         }
 
-        private void OnSpawning(SpawningEventArgs ev)
+        private static void OnSpawning(SpawningEventArgs ev)
         {
             if (!(Scp457.Get(ev.Player) is Scp457 scp457))
                 return;
@@ -106,7 +106,7 @@ namespace Scp457.EventHandlers
                 ev.Position = pos;
         }
 
-        private void OnVerified(VerifiedEventArgs ev)
+        private static void OnVerified(VerifiedEventArgs ev)
         {
             BurningHandler.Dictionary.Add(ev.Player, new BurningHandler(ev.Player));
         }

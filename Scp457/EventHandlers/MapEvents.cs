@@ -13,12 +13,12 @@ namespace Scp457.EventHandlers
     /// <summary>
     /// All event handlers which use <see cref="Exiled.Events.Handlers.Map"/>.
     /// </summary>
-    public class MapEvents
+    public static class MapEvents
     {
         /// <summary>
         /// Handles all subscriptions.
         /// </summary>
-        public void SubscribeEvents()
+        public static void SubscribeEvents()
         {
             MapHandlers.ExplodingGrenade += OnExplodingGrenade;
         }
@@ -26,12 +26,12 @@ namespace Scp457.EventHandlers
         /// <summary>
         /// Handles all unsubscribing.
         /// </summary>
-        public void UnsubscribeEvents()
+        public static void UnsubscribeEvents()
         {
             MapHandlers.ExplodingGrenade -= OnExplodingGrenade;
         }
 
-        private void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
+        private static void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
         {
             if (Methods.IgnoredGrenades.Remove(ev.Grenade))
                 ev.IsAllowed = false;

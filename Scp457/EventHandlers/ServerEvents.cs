@@ -18,12 +18,12 @@ namespace Scp457.EventHandlers
     /// <summary>
     /// All event handlers which use <see cref="Exiled.Events.Handlers.Server"/>.
     /// </summary>
-    public class ServerEvents
+    public static class ServerEvents
     {
         /// <summary>
         /// Handles all subscriptions.
         /// </summary>
-        public void SubscribeEvents()
+        public static void SubscribeEvents()
         {
             ServerHandlers.ReloadedConfigs += OnReloadedConfigs;
             ServerHandlers.RoundStarted += OnRoundStarted;
@@ -33,14 +33,14 @@ namespace Scp457.EventHandlers
         /// <summary>
         /// Handles all unsubscribing.
         /// </summary>
-        public void UnsubscribeEvents()
+        public static void UnsubscribeEvents()
         {
             ServerHandlers.ReloadedConfigs -= OnReloadedConfigs;
             ServerHandlers.RoundStarted -= OnRoundStarted;
             ServerHandlers.WaitingForPlayers -= OnWaitingForPlayers;
         }
 
-        private void OnReloadedConfigs()
+        private static void OnReloadedConfigs()
         {
             if (Plugin.Instance.Config.AttackSettings.OrbSpacing <= 0f)
             {
@@ -49,7 +49,7 @@ namespace Scp457.EventHandlers
             }
         }
 
-        private void OnRoundStarted()
+        private static void OnRoundStarted()
         {
             Timing.CallDelayed(1.5f, () =>
             {
@@ -65,7 +65,7 @@ namespace Scp457.EventHandlers
             });
         }
 
-        private void OnWaitingForPlayers()
+        private static void OnWaitingForPlayers()
         {
             Scp457.Dictionary.Clear();
             BurningHandler.Dictionary.Clear();

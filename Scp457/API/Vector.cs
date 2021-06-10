@@ -17,6 +17,19 @@ namespace Scp457.API
     public struct Vector
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Vector"/> struct.
+        /// </summary>
+        /// <param name="x"><inheritdoc cref="X"/></param>
+        /// <param name="y"><inheritdoc cref="Y"/></param>
+        /// <param name="z"><inheritdoc cref="Z"/></param>
+        public Vector(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        /// <summary>
         /// Gets or sets the abscissa axis value.
         /// </summary>
         public float X { get; set; }

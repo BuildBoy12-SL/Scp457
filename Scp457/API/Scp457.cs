@@ -179,11 +179,11 @@ namespace Scp457.API
 
             if (Plugin.Instance.Config.AttackSettings.Pierce)
             {
-                TryPierceAttack(ray, endPoint);
+                TryPierceHit(ray, endPoint);
                 return;
             }
 
-            TryAttack(ray, endPoint);
+            TryHit(ray, endPoint);
         }
 
         private static bool IsTargetable(Player player)
@@ -194,7 +194,7 @@ namespace Scp457.API
                                   && !player.SessionVariables.ContainsKey("IsNPC");
         }
 
-        private void TryAttack(Ray ray, Vector3 endPoint)
+        private void TryHit(Ray ray, Vector3 endPoint)
         {
             bool hit = Physics.Raycast(ray, out var raycastHit, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
 
@@ -202,10 +202,10 @@ namespace Scp457.API
                 DrawAttack(hit ? raycastHit.point : endPoint);
 
             if (hit)
-                TryHit(raycastHit);
+                TryAttack(raycastHit);
         }
 
-        private void TryPierceAttack(Ray ray, Vector3 endPoint)
+        private void TryPierceHit(Ray ray, Vector3 endPoint)
         {
             if (Plugin.Instance.Config.AttackSettings.ShowAttack)
             {
@@ -215,10 +215,10 @@ namespace Scp457.API
 
             int hitCount = Physics.RaycastNonAlloc(ray, hits, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
             for (int i = 0; i < hitCount; i++)
-                TryHit(hits[i]);
+                TryAttack(hits[i]);
         }
 
-        private void TryHit(RaycastHit raycastHit)
+        private void TryAttack(RaycastHit raycastHit)
         {
             var netIdentity = raycastHit.collider.GetComponentInParent<NetworkIdentity>();
             if (netIdentity == null)
@@ -246,15 +246,20 @@ namespace Scp457.API
             burningHandler.BurnTime = burnTime;
             target.Hurt(config.AttackSettings.Damage, DamageTypes.Asphyxiation, Player.Nickname, Player.Id);
             Scp0492PlayerScript.TargetHitMarker(Player.Connection);
-            Player.ReferenceHub.characterClassManager.RpcPlaceBlood(target.Position, 1, 2);
+
+            if (config.AttackSettings.PlaceBlood)
+                Player.ReferenceHub.characterClassManager.RpcPlaceBlood(target.Position, 1, 2);
         }
 
         private void DrawAttack(Vector3 target)
         {
-            float distance = Vector3.Distance(Player.CameraTransform.position, target);
+            var cameraTransform = Player.CameraTransform;
+            var cameraPosition = cameraTransform.position;
+
+            float distance = Vector3.Distance(cameraPosition, target);
             while (distance > 0)
             {
-                points.Add((Player.CameraTransform.forward * distance) + Player.CameraTransform.position);
+                points.Add((cameraTransform.forward * distance) + cameraPosition);
                 distance -= Plugin.Instance.Config.AttackSettings.OrbSpacing;
             }
 
