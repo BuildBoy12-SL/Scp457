@@ -16,6 +16,7 @@ namespace Scp457.API
     /// </summary>
     public class BurningHandler
     {
+        private readonly Config config;
         private CoroutineHandle burn;
         private float burnTime;
 
@@ -26,6 +27,7 @@ namespace Scp457.API
         public BurningHandler(Player player)
         {
             Player = player;
+            config = Plugin.Instance.Config;
         }
 
         /// <summary>
@@ -101,26 +103,26 @@ namespace Scp457.API
         /// <returns>An internal delay.</returns>
         private IEnumerator<float> Burn()
         {
-            Log.Debug($"Starting burn sequence for {Player.Nickname}.", Plugin.Instance.Config.ShowDebug);
+            Log.Debug($"Starting burn sequence for {Player.Nickname}.", config.ShowDebug);
             while (BurnTime > 0f)
             {
                 if (Player.IsGodModeEnabled || LastAttacker == null
                                             || LastAttacker.Scp0492PlayerScript == null
                                             || LastAttacker.Player == null)
                 {
-                    Log.Debug($"{Player.Nickname} is in god mode or required logic is null, ending burn sequence.", Plugin.Instance.Config.ShowDebug);
+                    Log.Debug($"{Player.Nickname} is in god mode or required logic is null, ending burn sequence.", config.ShowDebug);
                     break;
                 }
 
-                Player.Hurt(Plugin.Instance.Config.BurnSettings.Damage, DamageTypes.Asphyxiation, "SCP457");
+                Player.Hurt(config.BurnSettings.Damage, DamageTypes.Asphyxiation, "SCP457");
                 LastAttacker.Scp0492PlayerScript.TargetHitMarker(LastAttacker.Player.Connection);
-                BurnTime -= Plugin.Instance.Config.BurnSettings.TickDuration;
-                Log.Debug($"Damaged {Player.Nickname} on burn, waiting for tick duration.", Plugin.Instance.Config.ShowDebug);
-                yield return Timing.WaitForSeconds(Plugin.Instance.Config.BurnSettings.TickDuration);
+                BurnTime -= config.BurnSettings.TickDuration;
+                Log.Debug($"Damaged {Player.Nickname} on burn, waiting for tick duration.", config.ShowDebug);
+                yield return Timing.WaitForSeconds(config.BurnSettings.TickDuration);
             }
 
             BurnTime = 0f;
-            Log.Debug($"Ended burn sequence for {Player.Nickname}.", Plugin.Instance.Config.ShowDebug);
+            Log.Debug($"Ended burn sequence for {Player.Nickname}.", config.ShowDebug);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Scp457.API
     {
         private const string SessionVariable = "IsScp457";
         private static readonly int WallMask = LayerMask.GetMask("Default", "Door", "Glass");
+        private readonly Config config;
         private readonly List<Vector3> points = new List<Vector3>();
         private readonly RaycastHit[] hits = new RaycastHit[20];
         private readonly CoroutineHandle updateBurn;
@@ -35,8 +36,9 @@ namespace Scp457.API
         {
             Player = player;
             Scp0492PlayerScript = Player.GameObject.GetComponent<Scp049_2PlayerScript>();
+            config = Plugin.Instance.Config;
             updateBurn = Timing.RunCoroutine(UpdateBurn());
-            Log.Debug($"Instantiated {Player.Nickname} as a Scp457.", Plugin.Instance.Config.ShowDebug);
+            Log.Debug($"Instantiated {Player.Nickname} as a Scp457.", config.ShowDebug);
         }
 
         /// <summary>
@@ -132,11 +134,11 @@ namespace Scp457.API
             if (player == null)
                 return;
 
+            Config config = Plugin.Instance.Config;
+
             Dictionary.Add(player, new Scp457(player));
 
             player.Role = RoleType.Scp0492;
-
-            Config config = Plugin.Instance.Config;
 
             player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
             player.CustomInfo = config.Scp457Settings.Badge;
@@ -163,7 +165,7 @@ namespace Scp457.API
             Player.Scale = Vector3.one;
             Player.CustomInfo = string.Empty;
             Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-            Log.Debug($"Destroyed {Player.Nickname}'s Scp457 instance.", Plugin.Instance.Config.ShowDebug);
+            Log.Debug($"Destroyed {Player.Nickname}'s Scp457 instance.", config.ShowDebug);
         }
 
         /// <summary>
@@ -175,9 +177,9 @@ namespace Scp457.API
             Vector3 cameraPosition = Player.CameraTransform.position;
 
             Ray ray = new Ray(cameraPosition + forward, forward);
-            Vector3 endPoint = cameraPosition + (forward * Plugin.Instance.Config.AttackSettings.Distance);
+            Vector3 endPoint = cameraPosition + (forward * config.AttackSettings.Distance);
 
-            if (Plugin.Instance.Config.AttackSettings.Pierce)
+            if (config.AttackSettings.Pierce)
             {
                 TryPierceHit(ray, endPoint);
                 return;
@@ -196,9 +198,9 @@ namespace Scp457.API
 
         private void TryHit(Ray ray, Vector3 endPoint)
         {
-            bool hit = Physics.Raycast(ray, out var raycastHit, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
+            bool hit = Physics.Raycast(ray, out var raycastHit, config.AttackSettings.Distance, WallMask);
 
-            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+            if (config.AttackSettings.ShowAttack)
                 DrawAttack(hit ? raycastHit.point : endPoint);
 
             if (hit)
@@ -207,13 +209,14 @@ namespace Scp457.API
 
         private void TryPierceHit(Ray ray, Vector3 endPoint)
         {
-            if (Plugin.Instance.Config.AttackSettings.ShowAttack)
+            float attackDistance = config.AttackSettings.Distance;
+            if (config.AttackSettings.ShowAttack)
             {
-                bool hit = Physics.Raycast(ray, out RaycastHit raycastHit, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
+                bool hit = Physics.Raycast(ray, out RaycastHit raycastHit, attackDistance, WallMask);
                 DrawAttack(hit ? raycastHit.point : endPoint);
             }
 
-            int hitCount = Physics.RaycastNonAlloc(ray, hits, Plugin.Instance.Config.AttackSettings.Distance, WallMask);
+            int hitCount = Physics.RaycastNonAlloc(ray, hits, attackDistance, WallMask);
             for (int i = 0; i < hitCount; i++)
                 TryAttack(hits[i]);
         }
@@ -237,10 +240,9 @@ namespace Scp457.API
             if (!(BurningHandler.Get(target) is BurningHandler burningHandler))
                 return;
 
-            Config config = Plugin.Instance.Config;
             float burnTime = burningHandler.BurnTime + config.AttackSettings.BurnDuration;
-            if (burnTime > Plugin.Instance.Config.BurnSettings.MaximumDuration)
-                burnTime = Plugin.Instance.Config.BurnSettings.MaximumDuration;
+            if (burnTime > config.BurnSettings.MaximumDuration)
+                burnTime = config.BurnSettings.MaximumDuration;
 
             burningHandler.LastAttacker = this;
             burningHandler.BurnTime = burnTime;
@@ -260,7 +262,7 @@ namespace Scp457.API
             while (distance > 0)
             {
                 points.Add((cameraTransform.forward * distance) + cameraPosition);
-                distance -= Plugin.Instance.Config.AttackSettings.OrbSpacing;
+                distance -= config.AttackSettings.OrbSpacing;
             }
 
             for (int i = 0; i < points.Count; i++)
@@ -285,7 +287,7 @@ namespace Scp457.API
                     if (!(BurningHandler.Get(player) is BurningHandler burningHandler))
                         continue;
 
-                    if (Vector3.Distance(Player.Position, player.Position) > Plugin.Instance.Config.Scp457Settings.BurnRadius)
+                    if (Vector3.Distance(Player.Position, player.Position) > config.Scp457Settings.BurnRadius)
                     {
                         burningHandler.HasBurned = false;
                         continue;
