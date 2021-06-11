@@ -54,9 +54,9 @@ namespace Scp457.Commands.Client
 
             foreach (Player ply in Player.List)
             {
-                if (ply.IsScp || ply.SessionVariables.ContainsKey("IsScp035")
-                              || ply.SessionVariables.ContainsKey("IsGhostSpectator")
-                              || ply.SessionVariables.ContainsKey("IsNPC"))
+                if (ply.IsScp || ply.IsScp035()
+                              || ply.IsGhostSpectator()
+                              || ply.IsNpc())
                     continue;
 
                 BurningHandler burningHandler = BurningHandler.Get(ply);

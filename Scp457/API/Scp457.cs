@@ -162,6 +162,7 @@ namespace Scp457.API
             Timing.KillCoroutines(updateCooldown);
             Player.SessionVariables.Remove(SessionVariable);
             Dictionary.Remove(Player);
+            GameObjectCache.Remove(Player.GameObject);
             Player.Scale = Vector3.one;
             Player.CustomInfo = string.Empty;
             Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
@@ -176,7 +177,7 @@ namespace Scp457.API
             Vector3 forward = Player.CameraTransform.forward;
             Vector3 cameraPosition = Player.CameraTransform.position;
 
-            Ray ray = new Ray(cameraPosition + forward, forward);
+            Ray ray = new Ray(cameraPosition, forward);
             Vector3 endPoint = cameraPosition + (forward * config.AttackSettings.Distance);
 
             if (config.AttackSettings.Pierce)
@@ -191,14 +192,14 @@ namespace Scp457.API
         private static bool IsTargetable(Player player)
         {
             return player.IsAlive && !player.IsScp
-                                  && !player.SessionVariables.ContainsKey("IsScp035")
-                                  && !player.SessionVariables.ContainsKey("IsGhostSpectator")
-                                  && !player.SessionVariables.ContainsKey("IsNPC");
+                                  && !player.IsScp035()
+                                  && !player.IsGhostSpectator()
+                                  && !player.IsNpc();
         }
 
         private void TryHit(Ray ray, Vector3 endPoint)
         {
-            bool hit = Physics.Raycast(ray, out var raycastHit, config.AttackSettings.Distance, WallMask);
+            bool hit = Physics.Raycast(ray, out var raycastHit, config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
 
             if (config.AttackSettings.ShowAttack)
                 DrawAttack(hit ? raycastHit.point : endPoint);
@@ -216,7 +217,7 @@ namespace Scp457.API
                 DrawAttack(hit ? raycastHit.point : endPoint);
             }
 
-            int hitCount = Physics.RaycastNonAlloc(ray, hits, attackDistance, WallMask);
+            int hitCount = Physics.RaycastNonAlloc(ray, hits, attackDistance, Player.ReferenceHub.weaponManager.raycastMask);
             for (int i = 0; i < hitCount; i++)
                 TryAttack(hits[i]);
         }

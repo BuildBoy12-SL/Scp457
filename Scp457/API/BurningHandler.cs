@@ -114,7 +114,7 @@ namespace Scp457.API
                     break;
                 }
 
-                Player.Hurt(config.BurnSettings.Damage, DamageTypes.Asphyxiation, "SCP457");
+                Player.Hurt(config.BurnSettings.Damage, DamageTypes.Asphyxiation, LastAttacker.Player.Nickname, LastAttacker.Player.Id);
                 LastAttacker.Scp0492PlayerScript.TargetHitMarker(LastAttacker.Player.Connection);
                 BurnTime -= config.BurnSettings.TickDuration;
                 Log.Debug($"Damaged {Player.Nickname} on burn, waiting for tick duration.", config.ShowDebug);
