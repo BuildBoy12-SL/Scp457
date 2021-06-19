@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="Scp0492AttackPatches.cs" company="Build">
+// <copyright file="Scp0492SwingPatch.cs" company="Build">
 // Copyright (c) Build. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
@@ -8,7 +8,6 @@
 namespace Scp457.Patches
 {
 #pragma warning disable SA1118
-#pragma warning disable SA1402
 #pragma warning disable SA1649
     using System.Collections.Generic;
     using System.Reflection.Emit;
@@ -19,17 +18,12 @@ namespace Scp457.Patches
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    /// Handles building new instructions.
+    /// Patches <see cref="Scp049_2PlayerScript.CallCmdShootAnim"/> to override when a <see cref="Scp457"/> attacks.
     /// </summary>
-    internal static class InstructionBuilder
+    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CallCmdShootAnim))]
+    internal static class ShootAnimPatch
     {
-        /// <summary>
-        /// Builds new instructions for <see cref="Scp049_2PlayerScript"/> attack patches to handle <see cref="Scp457"/>'s attack.
-        /// </summary>
-        /// <param name="instructions"><inheritdoc cref="CodeInstruction"/></param>
-        /// <param name="generator"><inheritdoc cref="ILGenerator"/></param>
-        /// <returns>New <see cref="CodeInstruction"/>.</returns>
-        internal static IEnumerable<CodeInstruction> AttackInstructions(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
 
@@ -64,25 +58,5 @@ namespace Scp457.Patches
 
             ListPool<CodeInstruction>.Shared.Return(newInstructions);
         }
-    }
-
-    /// <summary>
-    /// Patches <see cref="Scp049_2PlayerScript.CallCmdHurtPlayer"/> to override when a <see cref="Scp457"/> attacks.
-    /// </summary>
-    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CallCmdHurtPlayer))]
-    internal static class HurtPlayerPatch
-    {
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
-            => InstructionBuilder.AttackInstructions(instructions, generator);
-    }
-
-    /// <summary>
-    /// Patches <see cref="Scp049_2PlayerScript.CallCmdShootAnim"/> to override when a <see cref="Scp457"/> attacks.
-    /// </summary>
-    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CallCmdShootAnim))]
-    internal static class ShootAnimPatch
-    {
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
-            => InstructionBuilder.AttackInstructions(instructions, generator);
     }
 }
