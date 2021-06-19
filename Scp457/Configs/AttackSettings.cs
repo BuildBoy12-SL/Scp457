@@ -7,11 +7,15 @@
 
 namespace Scp457.Configs
 {
+    using Exiled.API.Features;
+
     /// <summary>
     /// A set of configs to determine how Scp457s main attack interacts.
     /// </summary>
     public class AttackSettings
     {
+        private float orbSpacing = 1f;
+
         /// <summary>
         /// Gets or sets the amount of inflicted damage.
         /// </summary>
@@ -45,6 +49,19 @@ namespace Scp457.Configs
         /// <summary>
         /// Gets or sets the spacing of the drawn markers.
         /// </summary>
-        public float OrbSpacing { get; set; } = 1f;
+        public float OrbSpacing
+        {
+            get => orbSpacing;
+            set
+            {
+                if (value <= 0f)
+                {
+                    value = 1f;
+                    Log.Warn("Do not set the Orb Spacing config to 0 or less than 0! Reverted to the default value of 1.");
+                }
+
+                orbSpacing = value;
+            }
+        }
     }
 }
