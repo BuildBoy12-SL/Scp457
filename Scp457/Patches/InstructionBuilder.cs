@@ -12,6 +12,7 @@ namespace Scp457.Patches
     using System.Reflection.Emit;
     using HarmonyLib;
     using NorthwoodLib.Pools;
+    using Scp457.API;
     using UnityEngine;
     using static HarmonyLib.AccessTools;
 
@@ -39,7 +40,7 @@ namespace Scp457.Patches
                 // if (Scp457.Get(this.gameObject) != null) return;
                 new CodeInstruction(OpCodes.Ldarg_0),
                 new CodeInstruction(OpCodes.Callvirt, PropertyGetter(typeof(Component), nameof(Component.gameObject))),
-                new CodeInstruction(OpCodes.Call, Method(typeof(API.Scp457), nameof(API.Scp457.Get), new[] { typeof(GameObject) })),
+                new CodeInstruction(OpCodes.Call, Method(typeof(Scp457), nameof(Scp457.Get), new[] { typeof(GameObject) })),
                 new CodeInstruction(OpCodes.Brtrue_S, returnLabel),
             });
 
