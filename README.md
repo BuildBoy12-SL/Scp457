@@ -13,7 +13,7 @@ The passive is the ability to inflict the Burned effect at a configurable radius
 
 ### Primary
 
-The primary fire is a long range line which is optionally indicated by a tracer. This attack does not pierce multiple targets and will inflict afterburn.
+The primary fire is a long range line which is optionally indicated by a tracer. This attack inflicts afterburn and can optionally pierce players.
 
 ### Ability
 
