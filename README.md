@@ -27,7 +27,7 @@ The ability is strictly command based. Given the name "combustion", an explosion
 | show_debug | Boolean | False | Whether debug messages should show. |
 
 ## Attack
-Configs for the corrosion of Scp035 instances.
+Configs for the main attack of Scp457, which overrides the default Scp0492 swing attack.
 
 | Config        | Type | Default | Description
 | :-------------: | :---------: | :---------: | :------ |
@@ -38,7 +38,7 @@ Configs for the corrosion of Scp035 instances.
 | orb_spacing | Float | 1 | The spacing of the drawn markers. |
 
 ## Burn
-Configs for the corrosion of players around Scp035 instances.
+Configs for the afterburn caused by being hit by one of Scp457's attacks
 
 | Config        | Type | Default | Description
 | :-------------: | :---------: | :---------: | :------ |
@@ -48,7 +48,7 @@ Configs for the corrosion of players around Scp035 instances.
 | healed_by | ItemType Array | Medkit, SCP500 | A collection of items that can heal a burn. |
 
 ## Combust
-Configs for the spawning of Scp035 item instances.
+Configs for the combustion ability.
 
 | Config        | Type | Default | Description
 | :-------------: | :---------: | :---------: | :------ |
@@ -60,7 +60,7 @@ Configs for the spawning of Scp035 item instances.
 | used_message | String | <color=green>Done.<\/color> | The message to be sent when combustion executes successfully. |
 
 ## Scp457
-Configs for the display of a notification to users looking at a Scp035 instance.
+Configs for the core aspects of Scp457.
 
 | Config        | Type | Default | Description
 | :-------------: | :---------: | :---------: | :------ |
