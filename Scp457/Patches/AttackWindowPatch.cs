@@ -15,7 +15,7 @@ namespace Scp457.Patches
     /// <summary>
     /// Patches <see cref="Scp049_2PlayerScript.CallCmdAttackWindow"/> to prevent <see cref="Scp457"/> from hitting windows.
     /// </summary>
-    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CallCmdAttackWindow))]
+    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CmdAttackWindow))]
     internal static class AttackWindowPatch
     {
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)

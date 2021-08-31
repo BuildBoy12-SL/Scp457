@@ -21,6 +21,7 @@ namespace Scp457.API
     {
         private const string SessionVariable = "IsScp457";
         private static readonly int WallMask = LayerMask.GetMask("Default", "Door", "Glass");
+        public static readonly int PlayerMask = LayerMask.GetMask("Player", "Hitbox");
         private readonly Config config;
         private readonly List<Vector3> points = new List<Vector3>();
         private readonly RaycastHit[] hits = new RaycastHit[20];
@@ -199,7 +200,7 @@ namespace Scp457.API
 
         private void TryHit(Ray ray, Vector3 endPoint)
         {
-            bool hit = Physics.Raycast(ray, out var raycastHit, config.AttackSettings.Distance, Player.ReferenceHub.weaponManager.raycastMask);
+            bool hit = Physics.Raycast(ray, out var raycastHit, config.AttackSettings.Distance, PlayerMask);
 
             if (config.AttackSettings.ShowAttack)
                 DrawAttack(hit ? raycastHit.point : endPoint);
@@ -217,7 +218,7 @@ namespace Scp457.API
                 DrawAttack(hit ? raycastHit.point : endPoint);
             }
 
-            int hitCount = Physics.RaycastNonAlloc(ray, hits, attackDistance, Player.ReferenceHub.weaponManager.raycastMask);
+            int hitCount = Physics.RaycastNonAlloc(ray, hits, attackDistance, PlayerMask);
             for (int i = 0; i < hitCount; i++)
                 TryAttack(hits[i]);
         }
@@ -232,7 +233,7 @@ namespace Scp457.API
             if (target == null || !IsTargetable(target))
                 return;
 
-            if (Player.ReferenceHub.weaponManager.GetShootPermission(target.ReferenceHub.characterClassManager))
+            if (HitboxIdentity.CheckFriendlyFire(Player.ReferenceHub, target.ReferenceHub))
                 RunAttack(target);
         }
 
@@ -256,7 +257,8 @@ namespace Scp457.API
 
         private void DrawAttack(Vector3 target)
         {
-            var cameraTransform = Player.CameraTransform;
+            return;
+            /*var cameraTransform = Player.CameraTransform;
             var cameraPosition = cameraTransform.position;
 
             float distance = Vector3.Distance(cameraPosition, target);
@@ -271,7 +273,7 @@ namespace Scp457.API
                 Player.ReferenceHub.weaponManager.RpcPlaceDecal(false, 1, points[i], Quaternion.FromToRotation(Vector3.up, Player.Rotation));
             }
 
-            points.Clear();
+            points.Clear();*/
         }
 
         private IEnumerator<float> UpdateBurn()

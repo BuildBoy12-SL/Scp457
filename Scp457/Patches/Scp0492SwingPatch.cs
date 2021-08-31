@@ -20,7 +20,7 @@ namespace Scp457.Patches
     /// <summary>
     /// Patches <see cref="Scp049_2PlayerScript.CallCmdShootAnim"/> to override when a <see cref="Scp457"/> attacks.
     /// </summary>
-    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CallCmdShootAnim))]
+    [HarmonyPatch(typeof(Scp049_2PlayerScript), nameof(Scp049_2PlayerScript.CmdShootAnim))]
     internal static class ShootAnimPatch
     {
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)

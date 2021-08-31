@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using Exiled.API.Enums;
+
 namespace Scp457.Commands.Client
 {
     using System;
@@ -12,7 +14,6 @@ namespace Scp457.Commands.Client
     using CustomPlayerEffects;
     using Exiled.API.Features;
     using global::RemoteAdmin;
-    using Grenades;
     using Scp457.API;
     using UnityEngine;
 
@@ -48,9 +49,7 @@ namespace Scp457.Commands.Client
                 return false;
             }
 
-            Grenade grenade = Methods.SpawnGrenade(player.Position, Vector3.zero, player, 0.1f);
-            if (grenade != null)
-                Methods.IgnoredGrenades.Add(grenade.gameObject);
+            Methods.SpawnGrenade(player.Position);
 
             foreach (Player ply in Player.List)
             {

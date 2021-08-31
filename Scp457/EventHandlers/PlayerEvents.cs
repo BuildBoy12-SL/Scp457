@@ -27,7 +27,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.ChangingRole += OnChangingRole;
             PlayerHandlers.Died += OnDied;
             PlayerHandlers.Destroying += OnDestroying;
-            PlayerHandlers.MedicalItemUsed += OnMedicalItemUsed;
+            PlayerHandlers.ItemUsed += OnItemUsed;
             PlayerHandlers.Shot += OnShot;
             PlayerHandlers.Spawning += OnSpawning;
             PlayerHandlers.Verified += OnVerified;
@@ -41,7 +41,7 @@ namespace Scp457.EventHandlers
             PlayerHandlers.ChangingRole -= OnChangingRole;
             PlayerHandlers.Died -= OnDied;
             PlayerHandlers.Destroying -= OnDestroying;
-            PlayerHandlers.MedicalItemUsed -= OnMedicalItemUsed;
+            PlayerHandlers.ItemUsed -= OnItemUsed;
             PlayerHandlers.Shot -= OnShot;
             PlayerHandlers.Spawning -= OnSpawning;
             PlayerHandlers.Verified -= OnVerified;
@@ -71,16 +71,16 @@ namespace Scp457.EventHandlers
                 scp457.Destroy();
         }
 
-        private static void OnMedicalItemUsed(UsedMedicalItemEventArgs ev)
+        private static void OnItemUsed(UsedItemEventArgs ev)
         {
-            if (Plugin.Instance.Config.BurnSettings.HealedBy.Contains(ev.Item) &&
+            if (Plugin.Instance.Config.BurnSettings.HealedBy.Contains(ev.Item.Type) &&
                 BurningHandler.Get(ev.Player) is BurningHandler burningHandler)
                 burningHandler.BurnTime = 0f;
         }
 
         private static void OnShot(ShotEventArgs ev)
         {
-            if (Scp457.Get(ev.Target) != null && ev.HitboxTypeEnum == HitBoxType.HEAD)
+            if (Scp457.Get(ev.Target) != null && ev.Hitbox._dmgMultiplier == HitboxIdentity.DamagePercent.Headshot)
                 ev.Damage /= 4;
         }
 
@@ -95,14 +95,14 @@ namespace Scp457.EventHandlers
                 return;
             }
 
-            DoorVariant door = Map.GetDoorByName(Plugin.Instance.Config.Scp457Settings.SpawnDoor);
+            Door door = Map.GetDoorByName(Plugin.Instance.Config.Scp457Settings.SpawnDoor);
             if (door == null)
             {
                 Log.Error("Could not find the spawn door for Scp457!");
                 return;
             }
 
-            if (PlayerMovementSync.FindSafePosition(door.transform.position, out Vector3 pos, true))
+            if (PlayerMovementSync.FindSafePosition(door.Base.transform.position, out Vector3 pos, true))
                 ev.Position = pos;
         }
 
